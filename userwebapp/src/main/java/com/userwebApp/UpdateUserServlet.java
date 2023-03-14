@@ -13,13 +13,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet("/addUserServlet")
+@WebServlet("/UpdateUserServlet")
 
-public class AddUserServlet extends HttpServlet {
+public class UpdateUserServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
 
-	public AddUserServlet() {
+	public UpdateUserServlet() {
 		super();
 	}
 
@@ -37,21 +37,19 @@ public class AddUserServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String firstName = req.getParameter("firstName");
-		String lastName = req.getParameter("lastName");
+		
 		String emailid = req.getParameter("emailid");
 		String password = req.getParameter("password");
 
 		try (Statement statement = connection.createStatement();) {
 
-			int result = statement.executeUpdate("insert into user values('" + firstName + "','" + lastName + "','"
-					+ emailid + "','" + password + "')");
+			int result =statement.executeUpdate("update user set password='"+ password +"' where email='"+emailid+"'");
 			PrintWriter out = resp.getWriter();
 			if (result > 0) {
-				out.println("<h1>User created in DB</h1>");
+				out.println("<h1>User updated in DB</h1>");
 
 			} else {
-				out.println("<h1>Error creating in DB</h1>");
+				out.println("<h1>Error updating in DB</h1>");
 
 			}
 			out.println("<a href=\"list.html\">Home</a>");
@@ -73,3 +71,4 @@ public class AddUserServlet extends HttpServlet {
 		}
 	}
 }
+

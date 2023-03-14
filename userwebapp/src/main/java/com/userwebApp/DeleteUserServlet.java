@@ -18,26 +18,33 @@ import javax.servlet.http.HttpServletResponse;
 public class DeleteUserServlet extends HttpServlet{
 
 private static final long serialVersionUID=1L;
+private Connection connection;
 public DeleteUserServlet()
 {
 super();	
 }
+ public void init()
+ {
+	 try {
+		Class.forName("com.mysql.jdbc.Driver");
+		connection =DriverManager.getConnection("jdbc:mysql://localhost/mydb","root","root");
+	} catch (ClassNotFoundException e) {
+		e.printStackTrace();
+	} catch (SQLException e) {
+		e.printStackTrace();
+	}
+ }
 @Override
 protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 	
 	String emailid = req.getParameter("emailid");
 
 	
-	try {
-		Class.forName("com.mysql.jdbc.Driver");
-	} catch (ClassNotFoundException e) {
-		e.printStackTrace();
-	}
-	Connection connection=null;
-	Statement statement =null;
-	try {
-		connection =DriverManager.getConnection("jdbc:mysql://localhost/mydb","root","root");
-		statement=connection.createStatement();
+	
+	
+	try (Statement	statement=connection.createStatement();){
+		
+		
 		
 		int result =statement.executeUpdate("delete from user where email='"+ emailid+"'");
 		PrintWriter out=resp.getWriter();
@@ -51,25 +58,26 @@ protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws S
 			out.println("<h1>Error deleting in DB</h1>");
 
 		}
-		out.println("<a href=\"index.html\">Home</a>");
+		out.println("<a href=\"list.html\">Home</a>");
 		
 	}
 	catch(SQLException e)
 	{
 		e.printStackTrace();
 	}
-	finally
-	{
-		
-		try {
-			statement.close();
-			connection.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-	}
+	
 	
 }
-
+public void destroy()
+{
+if(connection!=null)
+{
+try {
+	connection.close();
+} catch (SQLException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}	
+}
+}
 }
